@@ -2,7 +2,8 @@ import numpy as np
 !pip install scikit-fuzzy
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
-#mendeklarasi variable input dan output
+
+#Variable input dan output
 makanan = ctrl.Antecedent(np.arange(0, 11, 1), 'makanan')
 pelayanan = ctrl.Antecedent(np.arange(0, 11, 1), 'pelayanan')
 tip = ctrl.Consequent(np.arange(0, 31, 1), 'tip')
