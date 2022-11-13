@@ -1,0 +1,42 @@
+import numpy as np
+!pip install scikit-fuzzy
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+#mendeklarasi variable input dan output
+makanan = ctrl.Antecedent(np.arange(0, 11, 1), 'makanan')
+pelayanan = ctrl.Antecedent(np.arange(0, 11, 1), 'pelayanan')
+tip = ctrl.Consequent(np.arange(0, 31, 1), 'tip')
+
+#Rentang untuk penilaian makanan, pelayanan, dan tip
+makanan['buruk'] = fuzz.trapmf(makanan.universe, [0, 0, 1, 5])
+makanan['biasa'] = fuzz.trapmf(makanan.universe, [6, 6, 7, 8])
+makanan['lezat'] = fuzz.trapmf(makanan.universe, [8, 9, 10, 10])
+
+pelayanan['jelek'] = fuzz.trimf(pelayanan.universe, [0, 0, 4])
+pelayanan['sedang'] = fuzz.trimf(pelayanan.universe, [0, 5, 9])
+pelayanan['bagus'] = fuzz.trimf(pelayanan.universe, [6, 10, 10])
+
+tip['sedikit'] = fuzz.trimf(tip.universe, [0, 5, 10])
+tip['sedang'] = fuzz.trimf(tip.universe, [10, 15, 20])
+tip['banyak'] = fuzz.trimf(tip.universe, [20, 25, 30])
+
+makanan.view()
+pelayanan.view()
+tip.view()
+
+rule1 = ctrl.Rule(makanan['buruk'] | pelayanan['jelek'], tip['sedikit'])
+rule2 = ctrl.Rule(makanan['biasa']| pelayanan['sedang'], tip['sedang'])
+rule3 = ctrl.Rule(makanan['lezat'] & pelayanan['bagus'], tip['banyak'])
+
+tipping_ctrl = ctrl.ControlSystem([rule1,rule2,rule3])
+tipping = ctrl.ControlSystemSimulation(tipping_ctrl)
+
+ratemakan = int(input("Input rating makanan(1-10): "))
+ratepelayanan = int(input("Input rating kualitas pelayanan(1-10): "))
+tipping.input['makanan'] = ratemakan
+tipping.input['pelayanan'] = ratepelayanan
+
+tipping.compute()
+
+print(tipping.output['tip'])
+tip.view(sim=tipping)
